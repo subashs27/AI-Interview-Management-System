@@ -36,7 +36,7 @@ def is_valid_email(email):
 # Resume Upload
 # =====================================================
 
-if not state.interview_started:
+if not state.interview_started and not state.interview_finished:
     st.subheader("Candidate Details")
 
     name = st.text_input("Full Name *")
@@ -157,20 +157,68 @@ else:
 
                 except Exception as e:
 
-                    st.error(str(e))
+                    print("=" * 80)
+                    print("INTERVIEW ERROR")
+                    print("=" * 80)
 
                     import traceback
+                    traceback.print_exc()
 
-                    st.code(traceback.format_exc())
+                    st.error(
+                        "Something went wrong while evaluating your answer. "
+                        "Please try submitting the answer again."
+                    )
 
 
     else:
 
         report = manager.get_report()
 
-        st.success("🎉 Interview Completed")
+        candidate_name = report["candidate"].get("name", "Candidate")
+        candidate_email = report["candidate"].get("email", "N/A")
+        overall_score = report["overall_score"]
 
-        st.title("AI Interview Report")
+        st.title("🎉 Interview Completed")
+
+        if overall_score >= 70:
+
+            st.success("Interview completed successfully.")
+
+            st.markdown(f"""
+    ### Dear {candidate_name},
+
+    Thank you for completing the interview.
+
+    You have been **shortlisted for the next stage of the recruitment process**.
+
+    Your interview results will be forwarded to the **HR Department** for further review. You will receive an email regarding the next steps after the HR team completes the evaluation.
+
+    **Candidate Email:** {candidate_email}
+
+    Thank you for your time and participation.
+    """)
+
+        else:
+
+            st.info("Interview completed.")
+
+            st.markdown(f"""
+    ### Dear {candidate_name},
+
+    Thank you for participating in the interview.
+
+    Based on the assessment result, you have **not been shortlisted for the next round** of the recruitment process.
+
+    **Candidate Email:** {candidate_email}
+
+    We appreciate your time and effort and wish you success in your future opportunities.
+    """)
+
+        st.divider()
+
+        if st.button("🔄 Restart Interview", use_container_width=True):
+            state.reset()
+            st.rerun()
 
         # -------------------------------
         # Candidate Details

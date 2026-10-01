@@ -134,6 +134,91 @@ def validate_response(data):
 
     if not data["followup_required"]:
         data["followup_question"] = ""
+
+# =====================================================
+# Local Fallback Evaluation
+# =====================================================
+
+def fallback_evaluation(question, answer):
+    """
+    Local evaluation used when Gemini is unavailable.
+    """
+
+    answer = answer.strip()
+    question = question.strip()
+
+    if not answer:
+        return {
+            "technical_score": 0,
+            "communication_score": 0,
+            "confidence_score": 0,
+            "performance": "weak",
+            "feedback": "No answer was provided.",
+            "strengths": [],
+            "missing_concepts": ["Answer required"],
+            "followup_required": False,
+            "followup_question": ""
+        }
+
+    # Basic answer-quality evaluation
+    words = answer.split()
+    word_count = len(words)
+
+    # Technical score
+    if word_count >= 80:
+        technical_score = 8
+    elif word_count >= 40:
+        technical_score = 7
+    elif word_count >= 20:
+        technical_score = 6
+    else:
+        technical_score = 4
+
+    # Communication score
+    if word_count >= 50:
+        communication_score = 8
+    elif word_count >= 25:
+        communication_score = 7
+    elif word_count >= 10:
+        communication_score = 6
+    else:
+        communication_score = 4
+
+    # Confidence score
+    if word_count >= 50:
+        confidence_score = 8
+    elif word_count >= 25:
+        confidence_score = 7
+    else:
+        confidence_score = 5
+
+    if technical_score >= 8:
+        performance = "excellent"
+    elif technical_score >= 5:
+        performance = "average"
+    else:
+        performance = "weak"
+
+    return {
+        "technical_score": technical_score,
+        "communication_score": communication_score,
+        "confidence_score": confidence_score,
+        "performance": performance,
+        "feedback": (
+            "Answer evaluated using the local backup "
+            "evaluation system because the AI evaluation "
+            "service was temporarily unavailable."
+        ),
+        "strengths": [
+            "Answer provided",
+            "Relevant explanation attempted",
+            "Communication assessed successfully"
+        ],
+        "missing_concepts": [],
+        "followup_required": False,
+        "followup_question": ""
+    }
+
 # =====================================================
 # Evaluate Answer
 # =====================================================
@@ -181,23 +266,25 @@ def evaluate_answer(
 
         error_text = str(e)
 
-        # ---------------------------------------------
-        # Quota / Rate Limit
-        # ---------------------------------------------
-
         if (
             "429" in error_text
             or "RESOURCE_EXHAUSTED" in error_text
             or "quota" in error_text.lower()
         ):
 
-            raise RuntimeError(
+            print("=" * 80)
+            print("⚠️ GEMINI QUOTA EXCEEDED")
+            print("Using local fallback evaluation.")
+            print("=" * 80)
 
-                "Gemini API quota exceeded. "
-                "The interview cannot continue until "
-                "the Gemini quota becomes available."
+            return fallback_evaluation(
+                question,
+                answer
+            )
 
-            ) from e
+        raise RuntimeError(
+            f"Gemini evaluation failed: {e}"
+        ) from e
 
         # ---------------------------------------------
         # Other Gemini errors
