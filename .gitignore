@@ -1,1 +1,15 @@
+# Environment / secrets
 .env
+.env.*
+!.env.example
+
+# Python generated files
+__pycache__/
+*.pyc
+
+# macOS
+.DS_Store
+
+# Virtual environment
+venv/
+.venv/
