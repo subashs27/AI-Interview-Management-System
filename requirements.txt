@@ -1,4 +1,7 @@
 streamlit
-google-generativeai
+google-genai
 python-dotenv
 pandas
+PyMuPDF
+librosa
+streamlit-mic-recorder
