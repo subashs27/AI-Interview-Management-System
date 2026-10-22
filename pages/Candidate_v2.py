@@ -54,7 +54,16 @@ if not state.interview_started and not state.interview_finished:
             resume_text = extract_resume_text(uploaded_file)
 
         with st.spinner("Analyzing Resume..."):
-            candidate = analyze_resume(resume_text)
+            from google.genai.errors import ServerError
+
+            try:
+                candidate = analyze_resume(resume_text)
+            except ServerError:
+                st.error(
+                    "Gemini is temporarily unavailable. "
+                    "Please wait a few minutes and try again."
+                )
+                st.stop()
 
         st.success("Resume analyzed successfully")
 
