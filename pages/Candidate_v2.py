@@ -1,6 +1,6 @@
 import streamlit as st
 import re
-
+    
 from database.schema import create_tables
 from interview.interview_manager import InterviewManager
 from interview.session import get_state
@@ -21,6 +21,11 @@ st.set_page_config(
     page_title="AI Interview",
     layout="wide"
 )
+
+if st.session_state.get("interview_exited", False):
+    st.success("Interview exited successfully. Thank you for participating!")
+    st.stop()
+    
 create_tables()
 
 st.title("🎤 AI Interview System")
@@ -55,7 +60,6 @@ if not state.interview_started and not state.interview_finished:
             resume_text = extract_resume_text(uploaded_file)
 
         with st.spinner("Analyzing Resume..."):
-            from google.genai.errors import ServerError
 
             try:
                 candidate = analyze_resume(resume_text)
@@ -124,8 +128,8 @@ else:
                 except ServerError:
                     st.session_state.transcript = ""
                     st.warning(
-                        "Speech transcription is temporarily unavailable. "
-                        "Please type your answer instead, if text input is available."
+                        "Voice transcription is temporarily unavailable. "
+                        "Please type your answer below."
                     )
             metrics = analyze_voice(audio)
 
@@ -232,10 +236,6 @@ else:
     """)
 
         st.divider()
-
-        if st.button("🔄 Restart Interview", use_container_width=True):
-            state.reset()
-            st.rerun()
 
         # -------------------------------
         # Candidate Details
@@ -362,10 +362,9 @@ else:
         st.divider()
 
         if st.button(
-            "Restart Interview",
+            "Exit Interview",
             use_container_width=True
         ):
-
             state.reset()
-
+            st.session_state["interview_exited"] = True
             st.rerun()
