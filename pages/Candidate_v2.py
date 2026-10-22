@@ -5,6 +5,7 @@ from database.schema import create_tables
 from interview.interview_manager import InterviewManager
 from interview.session import get_state
 
+from google.genai.errors import ServerError
 from resume.resume_parser import extract_resume_text
 from resume.resume_analyzer import analyze_resume
 from knowledge.knowledge_retriever import retrieve_knowledge
@@ -117,8 +118,15 @@ else:
         if audio:
 
             with st.spinner("Transcribing Voice..."):
-                st.session_state.transcript = speech_to_text(audio)
-
+                try:
+                    st.session_state.transcript = speech_to_text(audio)
+                
+                except ServerError:
+                    st.session_state.transcript = ""
+                    st.warning(
+                        "Speech transcription is temporarily unavailable. "
+                        "Please type your answer instead, if text input is available."
+                    )
             metrics = analyze_voice(audio)
 
             metrics["speaking_rate"] = speaking_rate(
