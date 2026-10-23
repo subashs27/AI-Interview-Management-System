@@ -1,3 +1,20 @@
+## 🚀 Live Demo
+
+Try the application: [Open AI Interview Management System](https://ai-interview-management-system-88qsa6qb2jvn2cibmb7zg7.streamlit.app/)
+
+## Features
+- Resume upload and analysis
+- Candidate skills and project extraction
+- AI-powered interview question generation
+- Interview evaluation and feedback
+
+## Tech Stack
+Python · Streamlit · Gemini API · SQLite
+                    
+##  System Architecture 
+### 1. Candidate Module Workflow
+                    
+                    
                     AI Interview Management System
 
                              Candidate
@@ -77,12 +94,38 @@
                                ▼
                     Display to Candidate# AI-Interview-Management-System
 
-## Deploy on Render
+## 2 Admin Dashboard – How It Works
 
-This repository is a Streamlit application. Deploy it on Render as a **Web Service** (not as a Vercel serverless function):
+The Admin Dashboard allows administrators to generate and manage interview knowledge and questions for different technical roles and topics.
 
-1. Connect this repository in Render and create a Web Service using the included `render.yaml` Blueprint.
-2. Add `GOOGLE_API_KEY` in the service's environment settings.
-3. Deploy. Render installs dependencies from `requirements.txt` and starts Streamlit on Render's assigned port.
+### Workflow
+1. Select Topics: Provide roles, categories, and topics through a CSV file.
+2. Generate Knowledge: Gemini API generates technical concepts, interview questions, ideal answers, and evaluation criteria.
+3. Store Knowledge: Save generated content in the SQLite database.
+4. Support Interviews: The Candidate Dashboard retrieves relevant knowledge and questions for AI-assisted interviews.
 
-The SQLite database is stored in `knowledge.db`. Render's local filesystem is not persistent by default, so database changes made at runtime may be lost when the service restarts or redeploys.
+### Technologies Used
+- Frontend:Streamlit
+- AI:Google Gemini API
+- Backend:Python
+- Database:SQLite
+- Input:CSV
+
+
+## Run Locally
+1. Clone this repository.
+2. Install dependencies using `pip install -r requirements.txt`.
+3. Configure your Gemini API key using Streamlit secrets or environment variables.
+4. Run `streamlit run app.py`.
+
+##  Deployment
+The application is deployed on Streamlit Community Cloud.
+The app may take a short time to start after a period of inactivity.
+
+## Security Notes
+
+- Store API keys securely using Streamlit Cloud Secrets or environment variables.
+- Never commit API keys, passwords, or sensitive credentials to GitHub.
+- Use sample or fictional resumes when testing the application.
+- Handle candidate resumes and interview results responsibly to protect personal information.
+- Avoid exposing sensitive information in application logs or error messages.
