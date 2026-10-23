@@ -129,3 +129,9 @@ The app may take a short time to start after a period of inactivity.
 - Use sample or fictional resumes when testing the application.
 - Handle candidate resumes and interview results responsibly to protect personal information.
 - Avoid exposing sensitive information in application logs or error messages.
+
+## Author
+
+SUBASH S
+
+GitHub: [subashs27](https://github.com/subashs27)
